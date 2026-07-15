@@ -1,0 +1,9 @@
+﻿agreement_class,definition,forest_area_km2,forest_area_share_percent
+Same peak month,Delta month = 0,1805610.0000012848,23.59264497879831
+One-month offset,Delta month = 1,1918189.9999985718,25.06364922204421
+Two-month offset,Delta month = 2,1244875.0000000861,16.265912305515965
+Mismatched,Delta month >= 3,2684600.0000007283,35.07779349364152
+Exact alignment,Delta month = 0,1805610.0000012848,23.59264497879831
+Near alignment,Delta month <= 1,3723799.9999998566,48.65629420084252
+Broad alignment,Delta month <= 2,4968674.999999942,64.92220650635848
+Timing mismatch,Delta month >= 3,2684600.0000007283,35.07779349364152
