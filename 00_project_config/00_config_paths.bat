@@ -12,8 +12,8 @@ set "PYTHONIOENCODING=utf-8"
 REM ------------------------------------------------------------
 REM Python executable
 REM ------------------------------------------------------------
-REM Change this path if your conda environment is installed elsewhere.
-set "GEO_PYTHON=C:\HYAPP\Anaconda3-2023.07-2\envs\geo\python.exe"
+REM Define the GEO_PYTHON environment variable.
+if not defined GEO_PYTHON set "GEO_PYTHON=python"
 
 if exist "%GEO_PYTHON%" (
   set "PYTHON_EXE=%GEO_PYTHON%"
