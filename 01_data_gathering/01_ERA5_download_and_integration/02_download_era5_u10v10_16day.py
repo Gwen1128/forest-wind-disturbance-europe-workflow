@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 client = cdsapi.Client()
 
 DATASET = "reanalysis-era5-single-levels"
-SAVE_DIR = "E:/ERA/u10v10"  # Change this to your desired directory
+SAVE_DIR = "E:/ERA/u10v10"  # Change this to your directory
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 # Europe domain (WGS84): North, West, South, East
@@ -16,7 +16,6 @@ AREA = [71.2, -31.5, 23.75, 41.5]
 def retrieve_data(start_date: datetime, end_date: datetime):
     """
     Retrieve ERA5 u10/v10 for the given date range and save as a NetCDF file.
-    IMPORTANT: Uses CDS 'date' range to include ALL days in the window.
     """
     filename = os.path.join(
         SAVE_DIR,
