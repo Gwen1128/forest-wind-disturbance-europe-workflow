@@ -28,9 +28,9 @@ terraOptions(todisk = TRUE, memfrac = 0.5)
 # =========================================================
 # paths (SET THESE)
 # =========================================================
-lai_main_dir <- Sys.getenv("DP_LAI_MAIN_DIR", unset="/projappl/project_2011073/LAI_Export")
-lai_supp_dir <- Sys.getenv("DP_LAI_SUPP_DIR", unset="/projappl/project_2011073/LAI_EU_Supple")
-forwind_shp  <- Sys.getenv("DP_FORWIND_SHP", unset="/projappl/project_2011073/FORWIND appendix/FORWIND_v2.shp")
+lai_main_dir <- Sys.getenv("DP_LAI_MAIN_DIR", unset="/path/to/your/LAI_Export")
+lai_supp_dir <- Sys.getenv("DP_LAI_SUPP_DIR", unset="/path/to/your/LAI_EU_Supple")
+forwind_shp  <- Sys.getenv("DP_FORWIND_SHP", unset="/path/to/your/FORWIND appendix/FORWIND_v2.shp")
 
 output_dir <- Sys.getenv("DP_BFAST_OUTPUT_DIR", unset="bfast_output_global")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
@@ -63,7 +63,7 @@ FREQ <- 23
 MIN_NON_NA <- 30
 
 # batching
-BATCH_SIZE <- as.integer(Sys.getenv("DP_BFAST_BATCH_SIZE", unset="5000"))   # ✅ 建议 5000 起步；如果内存紧/IO抖动就降到 2000
+BATCH_SIZE <- as.integer(Sys.getenv("DP_BFAST_BATCH_SIZE", unset="5000"))   
 
 # near-field cap
 BIN1_CAP_MULT <- 1.5
@@ -81,14 +81,14 @@ if (file.exists(output_file) && file.exists(ckpt_file)) {
   last_done <- suppressWarnings(as.integer(readLines(ckpt_file, warn = FALSE)[1]))
   if (is.finite(last_done) && last_done > 0) {
     START_ROW <- last_done + 1L
-    logi(sprintf("🔁 Resume from START_ROW=%d (last_done=%d)", START_ROW, last_done))
+    logi(sprintf("Resume from START_ROW=%d (last_done=%d)", START_ROW, last_done))
   }
 }
 
 # =========================================================
 # 1) list rasters (NO global resample/cover)
 # =========================================================
-logi("📦 Listing LAI files ...")
+logi("Listing LAI files ...")
 main_files <- sort(list.files(lai_main_dir, pattern = "ForestLAI_.*\\.tif$", full.names = TRUE))
 supp_files <- sort(list.files(lai_supp_dir, pattern = "ForestLAI_.*\\.tif$", full.names = TRUE))
 stopifnot(length(main_files) > 0, length(supp_files) > 0)
@@ -106,7 +106,7 @@ names(r_supp) <- extract_date_name(supp_files)
 # --- Time alignment ---
 n_main_all <- nlyr(r_main)
 n_supp_all <- nlyr(r_supp)
-logi(sprintf("🧾 main layers (raw) = %d | supp layers (raw) = %d", n_main_all, n_supp_all))
+logi(sprintf("main layers (raw) = %d | supp layers (raw) = %d", n_main_all, n_supp_all))
 
 common_names <- intersect(names(r_main), names(r_supp))
 if (length(common_names) == 0) stop("No common dates between main and supp.")
@@ -116,30 +116,30 @@ common_names <- common_names[order(match(common_names, names(r_main)))]
 miss_in_supp <- setdiff(names(r_main), names(r_supp))
 miss_in_main <- setdiff(names(r_supp), names(r_main))
 if (length(miss_in_supp) > 0) {
-  logi(sprintf("⚠️ supp is missing %d date layers present in main. Example: %s",
+  logi(sprintf("supp is missing %d date layers present in main. Example: %s",
                length(miss_in_supp), paste(head(miss_in_supp, 5), collapse=", ")))
 }
 if (length(miss_in_main) > 0) {
-  logi(sprintf("⚠️ main is missing %d date layers present in supp. Example: %s",
+  logi(sprintf(" main is missing %d date layers present in supp. Example: %s",
                length(miss_in_main), paste(head(miss_in_main, 5), collapse=", ")))
 }
 
 r_main <- r_main[[common_names]]
 r_supp <- r_supp[[common_names]]
-logi(sprintf("✅ Common dates: %d layers", nlyr(r_main)))
+logi(sprintf("Common dates: %d layers", nlyr(r_main)))
 
 # parse layer_dates from names like "dYYYYMMDD"
 layer_dates <- as.Date(sub("^d", "", names(r_main)), format="%Y%m%d")
 if (any(is.na(layer_dates))) stop("layer_dates parse failed: names must be dYYYYMMDD.")
 N_T <- length(layer_dates)
 
-logi("🧭 Global extent (native):"); print(ext(r_main[[1]])); flush.console()
-logi("🧭 Global CRS (native):");   print(crs(r_main[[1]])); flush.console()
+logi("Global extent (native):"); print(ext(r_main[[1]])); flush.console()
+logi("Global CRS (native):");   print(crs(r_main[[1]])); flush.console()
 
 # =========================================================
 # 2) FORWIND read + CRS match (native)
 # =========================================================
-logi("📥 Reading FORWIND ...")
+logi("Reading FORWIND ...")
 fw <- vect(forwind_shp)
 if (!("EventDate" %in% names(fw))) stop("FORWIND has no EventDate field.")
 
@@ -150,16 +150,14 @@ fw$EventDate_int <- as.numeric(fw$EventDate_dt)   # numeric days since 1970
 fw$storm_id <- fw$EventDate_int
 
 if (!terra::same.crs(fw, r_main[[1]])) fw <- project(fw, crs(r_main[[1]]))
-logi(sprintf("✅ FORWIND polygons (global): %d", nrow(fw)))
+logi(sprintf("FORWIND polygons (global): %d", nrow(fw)))
 
 # =========================================================
 # 3) Metric template for sampling/distance ONLY
 #    FIXED: union cover of (main[[1]], supp[[1]]) in TARGET_CRS
 # =========================================================
-logi(sprintf("🧭 Building metric template (%s) [FIX: union cover] ...", TARGET_CRS))
+logi(sprintf("Building metric template (%s) [FIX: union cover] ...", TARGET_CRS))
 
-# 使用夏季图层（例如第12个图层，大约在6月底/7月初）来构建模板
-# 这样可以防止高纬度地区因为冬季积雪/极夜导致的全部 NA 而被当成非森林丢弃
 summer_idx <- min(12, nlyr(r_main)) 
 m1 <- terra::project(r_main[[summer_idx]], TARGET_CRS, method="near")
 s1 <- terra::project(r_supp[[summer_idx]], TARGET_CRS, method="near")
@@ -182,17 +180,16 @@ rm(m1, s1, m1u, s1u); gc()
 # --- sanity check: template domain in WGS84 ---
 {
   e <- terra::ext(template_m)
-  # ✅ FIXED: 转换为 data.frame 以完美适配 geom=c("x","y") 参数
   df_ext <- data.frame(
     x = c(e$xmin, e$xmin, e$xmax, e$xmax),
     y = c(e$ymin, e$ymax, e$ymin, e$ymax)
   )
   v <- terra::vect(df_ext, geom=c("x","y"), crs=terra::crs(template_m))
   xy <- terra::crds(terra::project(v, "EPSG:4326"))
-  logi(sprintf("🧭 template_m lon range: %.2f .. %.2f", min(xy[,1]), max(xy[,1])))
-  logi(sprintf("🧭 template_m lat range: %.2f .. %.2f", min(xy[,2]), max(xy[,2])))
+  logi(sprintf("template_m lon range: %.2f .. %.2f", min(xy[,1]), max(xy[,1])))
+  logi(sprintf("template_m lat range: %.2f .. %.2f", min(xy[,2]), max(xy[,2])))
   if (max(xy[,2]) < 70) {
-    logi(sprintf("⚠️ template_m lat_max=%.2f < 70N. If you expect coverage to ~71N, your inputs are still truncated.", max(xy[,2])))
+    logi(sprintf("template_m lat_max=%.2f < 70N. If you expect coverage to ~71N, your inputs are still truncated.", max(xy[,2])))
   }
 }
 
@@ -214,10 +211,10 @@ rm(pos_target, v); gc()
 # 4) POS table (metric)
 # =========================================================
 pos_cells <- which(!is.na(values(eventdate_m)) & forest_mask_m)
-logi(sprintf("🔎 pos_cells (metric global): %d", length(pos_cells)))
+logi(sprintf("pos_cells (metric global): %d", length(pos_cells)))
 if (length(pos_cells) == 0) stop("No positive cells after rasterize.")
 
-pos_dates_num <- values(eventdate_m)[pos_cells]             # numeric days since 1970
+pos_dates_num <- values(eventdate_m)[pos_cells]        
 pos_event_time <- as.Date(pos_dates_num, origin="1970-01-01")
 pos_xy_m <- xyFromCell(template_m, pos_cells)
 
@@ -234,7 +231,7 @@ pts_pos_df_m <- data.frame(
 )
 
 n_neg <- nrow(pts_pos_df_m) * neg_multiplier
-logi(sprintf("🎯 n_neg target: %d (ratio %d:1)", n_neg, neg_multiplier))
+logi(sprintf("n_neg target: %d (ratio %d:1)", n_neg, neg_multiplier))
 
 # =========================================================
 # 5) NEG sampling pools by distance strata
@@ -255,7 +252,7 @@ bin_levels <- levels(dist_bin)
 bin_pools <- lapply(bin_levels, function(bl) forest_cells[which(dist_bin == bl)])
 names(bin_pools) <- bin_levels
 bin_sizes <- sapply(bin_pools, length)
-logi("📌 Forest cells per distance bin (global):"); print(bin_sizes); flush.console()
+logi("Forest cells per distance bin (global):"); print(bin_sizes); flush.console()
 
 # allocate per bin + cap bin1
 n_target_bin <- floor(n_neg * DIST_PROP)
@@ -286,7 +283,7 @@ if ("bin1" %in% bin_levels) {
   }
 }
 stopifnot(sum(n_target_bin) == n_neg)
-logi("🧪 n_target_bin after cap/transfer (global):")
+logi(" n_target_bin after cap/transfer (global):")
 print(setNames(n_target_bin, bin_levels)); flush.console()
 
 # month-weighted dates from positive months
@@ -350,7 +347,7 @@ sample_neg_pairs <- function(pool_cells, n_need, max_tries_mult=30L) {
   }
 
   if (length(out_cells) < n_need) {
-    logi(sprintf("⚠️ Rejection sampling shortfall (need %d, got %d).", n_need, length(out_cells)))
+    logi(sprintf("Rejection sampling shortfall (need %d, got %d).", n_need, length(out_cells)))
   }
 
   out_cells <- out_cells[seq_len(min(n_need, length(out_cells)))]
@@ -367,7 +364,7 @@ for (j in seq_along(bin_levels)) {
 }
 shortfall <- n_neg - length(neg_cells)
 if (shortfall > 0) {
-  logi(sprintf("ℹ️ Filling shortfall: %d", shortfall))
+  logi(sprintf("Filling shortfall: %d", shortfall))
   res_fill <- sample_neg_pairs(forest_cells, shortfall)
   neg_cells <- c(neg_cells, res_fill$cells)
   neg_dates <- c(neg_dates, res_fill$dates)
@@ -390,7 +387,7 @@ pts_neg_df_m <- data.frame(
 # =========================================================
 # 6) Assign ref_event_* for NEG
 # =========================================================
-logi("🔗 Assigning ref_event_* for NEG (global) ...")
+logi("Assigning ref_event_* for NEG (global) ...")
 neg_pts_v <- terra::vect(pts_neg_df_m, geom=c("x","y"), crs=crs(template_m))
 fw_cent   <- terra::centroids(fw_m)
 
@@ -435,7 +432,7 @@ pts_df_m <- pts_df_m[, c(
   "index","x","y","label","event_time","storm_id",
   "ref_event_uid","ref_event_date","ref_storm_id","ref_event_dist_km"
 )]
-logi(sprintf("✅ Samples (global metric): pos=%d, neg=%d",
+logi(sprintf("Samples (global metric): pos=%d, neg=%d",
              sum(pts_df_m$label==1), sum(pts_df_m$label==0)))
 
 pts_v_m <- terra::vect(pts_df_m, geom=c("x","y"), crs=crs(template_m))
@@ -447,7 +444,7 @@ rm(pts_v_m, pts_v_native, template_m, event_mask_m, eventdate_m, dist_m, forest_
 # =========================================================
 # 8) FAST residual: precompute harmonic design matrix X
 # =========================================================
-logi("⚡ Precomputing harmonic design matrix ...")
+logi("Precomputing harmonic design matrix ...")
 t_idx <- 1:N_T
 X <- matrix(1, nrow=N_T, ncol=1 + 2*BFAST_ORDER)
 for (k in 1:BFAST_ORDER) {
@@ -534,12 +531,12 @@ if (!file.exists(output_file) || START_ROW == 1L) {
 }
 
 total_rows <- nrow(pts_df_m)
-logi(sprintf("🧮 Streaming extract+compute: total_rows=%d, START_ROW=%d, BATCH_SIZE=%d",
+logi(sprintf("Streaming extract+compute: total_rows=%d, START_ROW=%d, BATCH_SIZE=%d",
              total_rows, START_ROW, BATCH_SIZE))
 
 for (i_start in seq(START_ROW, total_rows, by=BATCH_SIZE)) {
   i_end <- min(i_start + BATCH_SIZE - 1L, total_rows)
-  logi(sprintf("📦 Batch: %d-%d / %d", i_start, i_end, total_rows))
+  logi(sprintf("Batch: %d-%d / %d", i_start, i_end, total_rows))
 
   coords_batch <- coords_native[i_start:i_end, , drop=FALSE]
   meta_batch   <- pts_df_m[i_start:i_end, , drop=FALSE]
