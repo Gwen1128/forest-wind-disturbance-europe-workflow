@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Unified Geospatial Feature Extraction Pipeline
-整合内容：
 1. DEM (Elevation, Slope, Aspect) + Crop & Reproject
 2. Local Wind Features (ERA5)
 3. Windwardness, Exposure, Terrain Roughness
@@ -9,7 +8,6 @@ Unified Geospatial Feature Extraction Pipeline
 5. Tree Height (Canopy)
 6. WWF Biome/Ecozone
 
-Author: Integrated by Gemini
 """
 
 import os
@@ -31,10 +29,9 @@ from scipy.ndimage import generic_filter
 from joblib import Parallel, delayed
 
 # ==========================================
-#               全局配置 (CONFIG)
+#               (CONFIG)
 # ==========================================
 CONFIG = {
-    # --- 输入/输出 基础路径 ---
     "input_initial_csv": r"E:/RF B+G/bfast_global.csv",  # 原始输入 CSV
     "work_dir": r"E:/RF B+G",                              # 工作目录 (用于存放中间和最终结果)
     
