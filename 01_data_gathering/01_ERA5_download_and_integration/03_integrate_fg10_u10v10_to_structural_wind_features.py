@@ -5,13 +5,13 @@ import pandas as pd
 from dask.diagnostics import ProgressBar
 from dask.distributed import Client
 
-# 初始化 Dask 客户端进行并行处理
+# Initialize Dask client for parallel processing
 client = Client(n_workers=8, threads_per_worker=1)
 print(client)
 
-# 设定输入输出目录
-SAVE_DIR = "/projappl/project_2011073/fg10eu"
-UV_DIR   = "/projappl/project_2011073/u10v10EU"
+# Set input and output directories
+SAVE_DIR = "/path/to/your/fg10eu"
+UV_DIR   = "/path/to/your/u10v10EU"
 
 OUT_NAME = "EU_final_structural_wind_features.nc"
 
@@ -46,18 +46,15 @@ def _drop_era5_junk(ds):
 
 def max_per_grid(wind_file, uv_file, debug_print=False):
     try:
-        # 建议：先 open 再 chunk，避免“stored chunks 不对齐”的性能警告
         ds_wind = xr.open_dataset(wind_file).chunk({"valid_time": 24})
         ds_uv   = xr.open_dataset(uv_file).chunk({"valid_time": 24})
 
         ds_wind = standardize_longitude(ds_wind)
         ds_uv   = standardize_longitude(ds_uv)
 
-        # 只保留需要的变量，减少对齐干扰与内存
         ds_wind = ds_wind[["fg10"]]
         ds_uv   = ds_uv[["u10", "v10"]]
 
-        # 对齐（交集）
         ds_wind, ds_uv = xr.align(ds_wind, ds_uv, join="inner")
 
         if debug_print:
@@ -68,7 +65,7 @@ def max_per_grid(wind_file, uv_file, debug_print=False):
                   "lat/lon:", ds_wind.sizes.get("latitude", -1), ds_wind.sizes.get("longitude", -1))
 
         if ds_wind.sizes.get("valid_time", 0) == 0:
-            raise ValueError("valid_time 交集为空：wind 与 uv 时间轴未对齐（或文件错配）")
+            raise ValueError("valid_time intersection is empty: wind and uv time axes are not aligned (or file mismatch)")
 
         fg10 = ds_wind["fg10"]
         u10  = ds_uv["u10"]
@@ -95,11 +92,9 @@ def max_per_grid(wind_file, uv_file, debug_print=False):
             output_dtypes=[np.float32],
         ).astype(np.float32)
 
-        # ---- 关键修复：清掉 isel 带出来的 valid_time 等辅助坐标，否则 concat 会把数据对齐成 NaN ----
         fg10_max = fg10_max.reset_coords(drop=True)
         wind_dir = wind_dir.reset_coords(drop=True)
 
-        # 构造“干净”的 result：只保留维度坐标 + 两个变量
         result = xr.Dataset(
             data_vars={
                 "max_wind_speed": (("latitude", "longitude"), fg10_max.data),
@@ -113,7 +108,7 @@ def max_per_grid(wind_file, uv_file, debug_print=False):
 
         result = _drop_era5_junk(result)
 
-        # 用 chunk 起始日做 time 坐标
+        # Use chunk start date as time coordinate
         time_str = os.path.basename(wind_file).split("chunk_")[-1].replace(".nc", "")
         start_time = pd.to_datetime(time_str.split("_")[0])
 
@@ -127,7 +122,7 @@ def max_per_grid(wind_file, uv_file, debug_print=False):
         return result
 
     except Exception as e:
-        print(f"❌ 处理文件出错 {wind_file}: {e}")
+        print(f"Error processing file {wind_file}: {e}")
         return None
 
 
@@ -154,7 +149,7 @@ def aggregate_max_per_grid(SAVE_DIR, UV_DIR, OUT_NAME, debug_print=False):
 
     keys = sorted(set(wind_map.keys()) & set(uv_map.keys()))
     if not keys:
-        print("❌ 找不到可匹配的 chunk（wind 与 u/v 没有任何共同 key）。")
+        print("No matching chunks found (wind and u/v have no common keys).")
         print("wind sample:", wind_files[:3])
         print("uv sample:", uv_files[:3])
         return None
@@ -163,31 +158,29 @@ def aggregate_max_per_grid(SAVE_DIR, UV_DIR, OUT_NAME, debug_print=False):
     for k in keys:
         w  = wind_map[k]
         uv = uv_map[k]
-        print(f"正在处理块: {k}")
+        print(f"Processing chunk: {k}")
 
         ds = max_per_grid(w, uv, debug_print=debug_print)
         if ds is None:
             continue
 
-        # 硬检查：每个块至少要有非 NaN
         if int(ds["max_wind_speed"].count().values) == 0:
-            print(f"❌ 块 {k} 结果全 NaN（不应发生），已跳过。")
+            print(f"Chunk {k} result is all NaN (should not happen), skipped.")
             continue
 
         datasets.append(ds)
 
     if not datasets:
-        print("❌ 所有块都无有效数据。")
+        print("No valid data in any chunks.")
         return None
 
-    print("🔁 正在进行时间维度合并...")
+    print("Merging along the time dimension.")
     combined = xr.concat(datasets, dim="time").sortby("time")
 
-    # 最终再做一次保险清理：任何残余坐标一律去掉
     combined = _drop_era5_junk(combined)
 
     output_file = os.path.join(SAVE_DIR, OUT_NAME)
-    print(f"💾 正在保存结果至: {output_file}")
+    print(f"saving result")
 
     encoding = {
         "max_wind_speed": {"zlib": True, "complevel": 4, "dtype": "float32",
@@ -199,7 +192,7 @@ def aggregate_max_per_grid(SAVE_DIR, UV_DIR, OUT_NAME, debug_print=False):
     with ProgressBar():
         combined.to_netcdf(output_file, encoding=encoding)
 
-    print("✅ 处理完成")
+    print("Processing complete")
     return output_file
 
 if __name__ == "__main__":
