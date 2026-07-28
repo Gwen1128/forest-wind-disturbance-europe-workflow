@@ -1,4 +1,0 @@
-Original uploaded files:
-3Aextract_fg10_features.py -> 01_download_era5_fg10_16day.py
-3Aextract_u10v10_features.py -> 02_download_era5_u10v10_16day.py
-3BmaxGS+u10v10.txt -> 03_integrate_fg10_u10v10_to_structural_wind_features.py
