@@ -2,9 +2,6 @@
 # bfast_global_fast_checkpoint_FIXED_DOMAIN.R
 # Global sampling (no tiles) + storm_id=EventDate
 # PU sampling: distance strata + month-weighted dates + anti-leakage + bin1 cap
-# For each NEG: store ref_event_uid/ref_event_date/ref_storm_id/ref_event_dist_km
-
-
 # =========================
 
 suppressPackageStartupMessages({
