@@ -1,15 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Model-family comparison and wind-only model training for the paper-result reproduction workflow.
-
 LOCKED schema training script for wind-disturbance PU learning.
-
-Expected core columns :
-- label (0/1), lon, lat, event_date 
-- LAI_departure 
-- wind: gust_peak_speed, days_since_gust_peak, gust_peak_percentile
-- struct: tree_height, terrain_roughness, slope, aspect_sin, aspect_cos, landcover_enc
-- cross inputs: windwardness, exposure_intensity (or exposure), plus safe cross (exposure-based)
 """
 
 from __future__ import annotations
