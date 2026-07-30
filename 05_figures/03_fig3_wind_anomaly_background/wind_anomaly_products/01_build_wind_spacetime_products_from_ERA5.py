@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-script for European wind spatial + temporal background maps.
+Jupyter-friendly unified script for European wind spatial + temporal background maps.
 """
 
 from pathlib import Path
