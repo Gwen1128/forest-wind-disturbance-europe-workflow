@@ -1,6 +1,6 @@
 # Data-preparation workflow for `clean_encoded_data_LOCKED.csv`
 
-This folder contains the upstream code needed to rebuild the modeling table used by the Table 1 training workflow.
+This folder contains the upstream code needed to build the Table 1.
 
 ## Main chain
 
@@ -25,20 +25,4 @@ This folder contains the upstream code needed to rebuild the modeling table used
    - CV target-encodes landcover.
    - Produces `clean_encoded_data_LOCKED.csv` and `encoders_LOCKED.json`.
 
-`03_optional_combine_feature_tiles.py` is only needed if feature extraction was run tile-by-tile and produced multiple `bfast*FINAL_ALL_FEATURES.csv` files.
 
-## Windows entry point
-
-Edit `../00_bat/00_config_paths.bat`, then run:
-
-```bat
-cd /d <package>\00_bat
-03_prepare_clean_encoded_data.bat
-```
-
-The BAT cannot run the Google Earth Engine export. It starts from `bfast_global.csv` if that file already exists; otherwise it attempts to run the R script if `Rscript`, LAI folders, and FORWIND shapefile are configured.
-
-
-## Release-package note
-
-Only the cleaned scripts in `scripts/` are retained in this release package. The duplicate original uploaded scripts with hard-coded local paths were removed to avoid ambiguity.
