@@ -64,13 +64,13 @@ set "FIG5_BACKGROUND=long_term"
 set "FIG5_WIND_PROFILE_METRIC=frequency"
 set "FIG5_FORCE_REBUILD=1"
 set "FIG5_REWRITE_TABLES_FROM_EXISTING_CSV=0"
-set "FIG5_FORCE_WIND_FROM_NC=0"
+set "FIG5_FORCE_WIND_FROM_NC=1"
 
 REM Locked original Fig.5 area weighting
 set "FIG5_HEX_AREA_KM2=%HEX_AREA_KM2%"
 set "FIG5_AREA_WEIGHT_MODE=hex"
 
-REM Remove final products only; keep upstream wind temporal metrics.
+REM Remove previously generated Fig. 5 outputs before rebuilding.
 del /q "%FIG5_RUN_OUTDIR%\merged_temporal_correspondence_long_term.csv" 2>nul
 del /q "%FIG5_RUN_OUTDIR%\TableS_temporal_correspondence_summary_long_term.csv" 2>nul
 del /q "%FIG5_RUN_OUTDIR%\TableS_peak_month_agreement_classes_long_term.csv" 2>nul
@@ -83,11 +83,11 @@ echo Reproducing Fig. 5
 echo Script              : %FIG5_SCRIPT%
 echo Fig.2 input         : %PRED_TEMP_CSV%
 echo Fig.1 geometry      : %FIG1_INDICATOR_CSV%
-echo Wind temporal input : %WIND_TEMP_CSV%
+echo Wind input          : %WIND_NC%
 echo Output              : %FIG5_RUN_OUTDIR%
 echo Wind metric         : frequency
 echo Area weighting      : complete hex area, %HEX_AREA_KM2% km2 per hex
-echo Force raw WIND_NC   : no
+echo Force raw WIND_NC   : yes
 echo Log                 : %LOG_FILE%
 echo ============================================================
 
