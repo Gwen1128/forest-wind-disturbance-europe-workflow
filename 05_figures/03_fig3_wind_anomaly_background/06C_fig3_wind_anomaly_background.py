@@ -37,7 +37,7 @@ def open_xarray_dataset_compat(path):
 # =========================================================
 INPUT_PRODUCTS_NC = Path(os.environ.get("WIND_PRODUCTS_NC", r"E:/RF B+G/your_path/wind_spacetime_products_europe_main_admin_no_russia_no_iceland.nc"))
 
-OUTDIR = Path(os.environ.get("FIG3_OUTDIR", r"E:/RF B+G/wind_spacetime_maps_europe_main_admin"))
+OUTDIR = Path(os.environ.get("FIG3_OUTDIR", r"E:/RF B+G/your_path"))
 OUTDIR.mkdir(parents=True, exist_ok=True)
 
 # Use your local country boundary shapefile.
