@@ -32,51 +32,51 @@ from joblib import Parallel, delayed
 #               (CONFIG)
 # ==========================================
 CONFIG = {
-    "input_initial_csv": r"E:/RF B+G/bfast_global.csv",  # 原始输入 CSV
-    "work_dir": r"E:/RF B+G",                              # 工作目录 (用于存放中间和最终结果)
+    "input_initial_csv": r"E:/RF B+G/bfast_global.csv", 
+    "work_dir": r"E:/RF B+G",                        
     
-    # --- 步骤 1: DEM 配置 ---
+    # --- DEM Configuration ---
     "dem_folder": r"E:/DEM tar",
     "dst_crs": "EPSG:3035",
     "target_resolution": 500,
     "dem_buffer_deg": 0.2,
-    "dem_tif_filename": "dem_500m_epsg3035.tif",           # 将生成的中间 DEM 文件名
-    "dem_bbox_wgs84": [-31.5, 23.75, 41.5, 71.2],          # 固定欧洲范围 [minx, miny, maxx, maxy]
+    "dem_tif_filename": "dem_500m_epsg3035.tif",          
+    "dem_bbox_wgs84": [-31.5, 23.75, 41.5, 71.2],        
     "dem_cutline_geojson": r"E:/RF B+G/europe_cutline_wgs84.geojson",
     "dem_src_nodata": -32768,
     "dem_dst_nodata": -9999.0,
     "gdal_warp_memory_mb": 2048,
     
-    # --- 步骤 2: Wind (ERA5) 配置 ---
+    # --- Wind (ERA5) Configuration ---
     "wind_nc_file": r"E:/ERA/ERA5 16 combine/EU_final_structural_wind_features.nc",
-    "wind_window_mode": "days",   # "days" or "steps"
+    "wind_window_mode": "days",  
     "wind_window_days": 32,
     "wind_n_jobs": 8,
     
-    # --- 步骤 3: Roughness 配置 ---
+    # --- Roughness Configuration ---
     "roughness_windows": (3, 5),
     "wind_dir_col": "struct_wind_dir_from_deg",
     "wind_max_col": "max_wind_event",
     
-    # --- 步骤 4: Landcover (MODIS) 配置 ---
+    # --- Landcover Configuration ---
     "lc_dir": r"E:/MODISLandcover",
     "lc_pattern": "MODIS_LC_Type1_{year}.tif",
     "lc_year_min": 2003,
     "lc_year_max": 2022,
     "lc_drop_fill": True,
     
-    # --- 步骤 5: Tree Height 配置 ---
+    # --- Tree Height Configuration ---
     "tree_tif": r"E:/TREE_HEIGHT/canopy_height_2005_Europe.tif",
     
-    # --- 步骤 6: Biome 配置 ---
+    # --- Biome Configuration ---
     "biome_tif": r"E:/biome_wwf_ecoregion.tif",
-    "encoders_json": r"E:/RF B+G/encoders.json",           # 最终编码字典路径
+    "encoders_json": r"E:/RF B+G/encoders.json",         
     
-    # --- 最终输出文件名 ---
+    # --- Final Output ---
     "final_output_csv": r"E:/RF B+G/bfastglobal_FINAL_ALL_FEATURES.csv"
 }
 
-# 辅助：Biome Lookup Table
+# Biome Lookup Table
 BIOME_LOOKUP = {
     1: "Tropical Moist Broadleaf Forests", 2: "Tropical Dry Broadleaf Forests",
     3: "Tropical Coniferous Forests", 4: "Temperate Broadleaf Forests",
@@ -85,7 +85,8 @@ BIOME_LOOKUP = {
     9: "Flooded Grasslands", 10: "Montane Grasslands", 11: "Tundra",
     12: "Mediterranean Forests", 13: "Deserts & Xeric Shrublands", 14: "Mangroves",
 }
-# 辅助：Landcover IGBP Map
+
+# Landcover IGBP Map
 IGBP_MAP = {
     0: "Water", 1: "Evergreen Needleleaf Forest", 2: "Evergreen Broadleaf Forest",
     3: "Deciduous Needleleaf Forest", 4: "Deciduous Broadleaf Forest", 5: "Mixed Forests",
@@ -96,10 +97,10 @@ IGBP_MAP = {
 }
 
 # ==========================================
-#           工具函数 (Utils)
+#           Functions (Utils)
 # ==========================================
 def update_encoders_json(path, new_dict):
-    """更新 JSON 编码字典，保留已有内容"""
+    """Update JSON encoder dictionary, preserving existing content"""
     if os.path.exists(path):
         try:
             with open(path, "r", encoding="utf-8") as f:
@@ -149,16 +150,16 @@ def step_1_dem(input_csv, output_csv, dem_out_tif):
     # 1) Normalize point coordinates to WGS84 for later point sampling
     x_sample = pd.to_numeric(df["x"], errors="coerce").mean()
     y_sample = pd.to_numeric(df["y"], errors="coerce").mean()
-    source_crs = "EPSG:3035"   # 如原始输入点不是 3035，请改这里
+    source_crs = "EPSG:3035"   
 
     if abs(x_sample) > 180 or abs(y_sample) > 90:
-        print(f"⚠️ Detected projected coordinates. Converting from {source_crs} to EPSG:4326...")
+        print(f"Detected projected coordinates. Converting from {source_crs} to EPSG:4326...")
         lons, lats = rio_transform(source_crs, "EPSG:4326", df["x"].to_numpy(), df["y"].to_numpy())
         df["x"] = lons
         df["y"] = lats
-        print("✅ Coordinate conversion complete. DataFrame updated to WGS84.")
+        print("Coordinate conversion complete. DataFrame updated to WGS84.")
     else:
-        print("✅ Input coordinates already appear to be WGS84.")
+        print("Input coordinates already appear to be WGS84.")
 
     # 2) Build DEM directly with GDAL Warp using fixed Europe cutline
     dem_folder = CONFIG["dem_folder"]
@@ -208,7 +209,7 @@ def step_1_dem(input_csv, output_csv, dem_out_tif):
     if ds is None:
         raise RuntimeError("GDAL Warp failed. Output DEM was not created.")
     ds = None
-    print(f"✅ Projected DEM saved to: {dem_out_tif}")
+    print(f"Projected DEM saved to: {dem_out_tif}")
 
     # 3) Read projected DEM and compute slope / aspect
     with rasterio.open(dem_out_tif) as src:
@@ -253,10 +254,10 @@ def step_1_dem(input_csv, output_csv, dem_out_tif):
     out_df = pd.DataFrame(gdf.drop(columns="geometry"))
     out_df.to_csv(output_csv, index=False)
 
-    print(f"✅ STEP 1 finished. Output saved to: {output_csv}")
+    print(f"STEP 1 finished. Output saved to: {output_csv}")
 
 # ==========================================
-#           步骤 2: Wind Features
+#            Wind Features
 # ==========================================
 def step_2_wind(input_csv, output_csv):
     print("\n=== STEP 2: Wind Features (ERA5) ===")
@@ -333,11 +334,11 @@ def step_2_wind(input_csv, output_csv):
     
     df_out = df.merge(res_df, on="index", how="left").drop(columns=["lon_idx", "lat_idx"], errors="ignore")
     df_out.to_csv(output_csv, index=False)
-    print(f"✅ Step 2 Done. Saved: {output_csv}")
+    print(f"Step 2 Done. Saved: {output_csv}")
     return output_csv
 
 # ==========================================
-#           修复版 Step 3: 强制整数索引
+#           Forced Integer Indexing
 # ==========================================
 def step_3_roughness(input_csv, output_csv, dem_tif):
     print("\n=== STEP 3: Exposure & Roughness (Int Fix) ===")
@@ -367,13 +368,10 @@ def step_3_roughness(input_csv, output_csv, dem_tif):
         dem = src.read(1).astype(float)
         dem[dem == src.nodata] = np.nan
         
-        # 准备采样坐标 (WGS84 -> Projected)
         xs, ys = rio_transform("EPSG:4326", src.crs, df.x.values, df.y.values)
         
-        # 获取行列号 (float)
         rows_f, cols_f = rowcol(src.transform, xs, ys, op=np.floor)
         
-        # ⚡️ 核心修复：Clip 之后必须强制转为 int ⚡️
         h, w = dem.shape
         rows = np.clip(rows_f, 0, h-1).astype(int)
         cols = np.clip(cols_f, 0, w-1).astype(int)
@@ -381,24 +379,21 @@ def step_3_roughness(input_csv, output_csv, dem_tif):
         # Calculate roughness maps and sample
         for win in CONFIG["roughness_windows"]:
             print(f"   Computing roughness std window {win}...")
-            # 计算全图 roughness
             r_map = generic_filter(dem, lambda v: np.std(v) if v.size > 0 else np.nan, size=win, mode="nearest")
             
-            # 使用整数索引提取
             df[f"terrain_roughness_std{win}"] = r_map[rows, cols]
             
-            # 顺便提取 500m 海拔 (只做一次)
             if win == CONFIG["roughness_windows"][0]:
                  df["elev_500m"] = dem[rows, cols]
 
     df.to_csv(output_csv, index=False)
-    print(f"✅ Step 3 Done. Saved: {output_csv}")
+    print(f"Done. Saved: {output_csv}")
     return output_csv
 # ==========================================
-#           步骤 4: Landcover
+#            Landcover
 # ==========================================
 def step_4_landcover(input_csv, output_csv):
-    print("\n=== STEP 4: MODIS Landcover ===")
+    print("\n===  MODIS Landcover ===")
     
     df = pd.read_csv(input_csv)
     # Find Date Col
@@ -417,7 +412,7 @@ def step_4_landcover(input_csv, output_csv):
         fname = CONFIG["lc_pattern"].format(year=year)
         path = os.path.join(CONFIG["lc_dir"], fname)
         if not os.path.exists(path):
-            print(f"   ⚠️ Missing LC file for {year}")
+            print(f"   Missing LC file for {year}")
             continue
             
         mask = df["year"] == year
@@ -445,11 +440,11 @@ def step_4_landcover(input_csv, output_csv):
     update_encoders_json(CONFIG["encoders_json"], lc_json)
     
     df.to_csv(output_csv, index=False)
-    print(f"✅ Step 4 Done. Saved: {output_csv}")
+    print(f"Done. Saved: {output_csv}")
     return output_csv
 
 # ==========================================
-#           步骤 5: Tree Height
+#           Tree Height
 # ==========================================
 def step_5_treeheight(input_csv, output_csv):
     print("\n=== STEP 5: Tree Height ===")
@@ -481,11 +476,11 @@ def step_5_treeheight(input_csv, output_csv):
         df["tree_height"] = vals
 
     df.to_csv(output_csv, index=False)
-    print(f"✅ Step 5 Done. Saved: {output_csv}")
+    print(f"Done. Saved: {output_csv}")
     return output_csv
 
 # ==========================================
-#           步骤 6: Biome
+#           Biome
 # ==========================================
 def step_6_biome(input_csv, output_csv):
     print("\n=== STEP 6: WWF Biome ===")
@@ -512,7 +507,7 @@ def step_6_biome(input_csv, output_csv):
     update_encoders_json(CONFIG["encoders_json"], biome_json)
     
     df.to_csv(output_csv, index=False)
-    print(f"✅ Step 6 Done. Final Saved: {output_csv}")
+    print(f" Done. Final Saved: {output_csv}")
     return output_csv
 
 
@@ -550,7 +545,7 @@ def apply_env_overrides():
         CONFIG["dem_bbox_wgs84"] = [float(x.strip()) for x in bbox.split(",")]
 
 # ==========================================
-#           主执行逻辑
+#           Main Execution Logic
 # ==========================================
 if __name__ == "__main__":
     apply_env_overrides()
@@ -588,10 +583,10 @@ if __name__ == "__main__":
         # Step 6: Input Step5 -> Final Output
         step_6_biome(f_step5, f_final)
         
-        print("\n🎉🎉🎉 All Processing Steps Completed Successfully! 🎉🎉🎉")
+        print("\n All Completed")
         print(f"Final Output: {f_final}")
         
     except Exception as e:
-        print(f"\n❌ Pipeline Failed: {e}")
+        print(f"\n Pipeline Failed: {e}")
         import traceback
         traceback.print_exc()
