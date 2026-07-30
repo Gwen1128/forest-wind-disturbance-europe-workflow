@@ -2,46 +2,6 @@
 """
 Section 3.6 final analysis
 Temporal correspondence between wind-anomaly timing and predicted disturbance potential
-
-This script now uses a cached-CSV-first workflow.
-
-If OUTDIR / merged_temporal_correspondence_<background>.csv already exists,
-the script reads that CSV and goes directly to plotting. It only rebuilds the
-intermediate temporal metrics when the merged CSV is missing, invalid, or when
-FIG5_FORCE_REBUILD=1 is set.
-
-Main scientific question
-------------------------
-Compare wind-anomaly temporal metrics and disturbance-prediction temporal metrics:
-1) peak month correspondence
-2) peak-month share / temporal concentration correspondence
-
-Default main analysis uses wind-anomaly FREQUENCY timing.
-For supplementary anomaly-intensity timing, set WIND_PROFILE_METRIC = "intensity".
-
-Input hierarchy
----------------
-Prediction timing:
-A) If PRED_TEMP_CSV exists, read prediction peak month/share from it.
-B) Otherwise, compute prediction peak month/share from PRED_PERIOD_CSV.
-
-Wind-anomaly timing:
-A) If WIND_TEMP_CSV exists, read wind-anomaly peak month/share from it.
-B) Else if WIND_MONTHLY_PROFILE_CSV exists, compute peak month/share from monthly profile.
-C) Else if WIND_PERIOD_ANOMALY_CSV exists, build monthly profile from existing z anomaly.
-D) Else if ALLOW_BUILD_WIND_FROM_NC=True, sample WIND_NC and build z anomaly timing.
-
-Outputs
--------
-OUTDIR / merged_temporal_correspondence_<background>.csv
-OUTDIR / TableS_temporal_correspondence_summary_<background>.csv
-OUTDIR / TableS_peak_month_agreement_classes_<background>.csv
-OUTDIR / TableS_temporal_correlations_<background>.csv
-OUTDIR / TableS_prediction_temporal_metrics_<background>.csv
-OUTDIR / TableS_wind_anomaly_temporal_metrics_<background>.csv
-OUTDIR / TableS_wind_monthly_profile_<background>.csv if created/read
-OUTDIR / Fig6_temporal_correspondence_<background>.png/pdf
-OUTDIR / debug_temporal_correspondence_plot_points_<background>.csv
 """
 
 from pathlib import Path
