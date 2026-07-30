@@ -1,27 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Plot the revised 5-panel European wind-anomaly figure from an existing products NetCDF.
-
-This script does NOT recompute wind-anomaly products from the original ERA5 NetCDF.
-It reads the already-created products NetCDF, for example:
-wind_spacetime_products_europe_main_admin_no_russia_no_iceland.nc
-
-Panels
-------
-(a) Maximum wind anomaly intensity
-(b) Wind anomaly frequency
-(c) Intensity–frequency contrast
-(d) Peak month of wind anomaly
-(e) Peak-month share
-
-Main layout/style choices
--------------------------
-- Uses ETRS89-LAEA Europe / EPSG:3035 for plotting.
-- Removes non-European surrounding country boundaries by whitelist filtering.
-- Excludes Russia and Iceland.
-- Puts panel (c) legend inside the map, aligned tightly to the right edge with smaller text.
-- Centers the second row using a 2 x 6 GridSpec layout.
-- Uses transparent figure and axes backgrounds.
+Plot the revised 5-panel European wind-anomaly figure.
 """
 
 from pathlib import Path
