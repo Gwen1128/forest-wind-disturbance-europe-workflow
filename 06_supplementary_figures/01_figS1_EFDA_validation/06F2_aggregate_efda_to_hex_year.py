@@ -1,15 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Aggregate EFDA 30 m disturbance products to hex-year.
-
-Supports:
-- annual disturbance stack
-- year-coded disturbance raster
-- annual binary raster
-- optional annual disturbance agent stack
-
-Outputs:
-- efda_hex_year_disturbance.csv
 """
 from shapely import wkt
 from pathlib import Path
@@ -47,22 +38,15 @@ END_YEAR = 2023
 
 HEX_ID_COL = "hex_id"
 
-# Use these if auto selection fails.
 FORCE_DISTURBANCE_FILES = []
 FORCE_AGENT_FILES = []
 
-# Band-year mapping for annual stacks.
-# EFDA covers 1985-2023. If band descriptions are unavailable,
-# assume band 1 = 1985, band 2 = 1986, ...
 STACK_START_YEAR = 1985
 
-# Rasterization
 ALL_TOUCHED = False
 
-# Minimum valid 30m pixels per hex-year.
 MIN_VALID_PIXELS = 10
 
-# Agent codes from EFDA description:
 # 1 wind/bark beetle complex, 2 fire, 3 harvest, 4 mixed
 AGENT_WIND_BARK = 1
 AGENT_FIRE = 2
@@ -115,16 +99,6 @@ def select_files_from_inventory(inv):
 
 
 def load_hex_grid(path, target_crs):
-    """
-    Load analyzed forest hexagons from either a vector file or a CSV with WKT geometry.
-
-    The current final hex CSV:
-    E:/RF_BG_REPRO_from_model_dev/outputs/04_fig1_spatial_indicators/
-    hex_indicator_summary_stylematch_4326.csv
-
-    contains projected polygon WKT geometries in EPSG:3035, despite the
-    filename containing 4326. Therefore, CSV geometries are assigned EPSG:3035.
-    """
     path = Path(path)
 
     if path.suffix.lower() == ".csv":
