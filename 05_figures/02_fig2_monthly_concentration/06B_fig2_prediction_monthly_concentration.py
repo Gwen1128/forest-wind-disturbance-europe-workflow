@@ -1,22 +1,5 @@
 # ============================================================
 # Monthly peak timing and concentration of wall-to-wall predicted
-# wind-disturbance likelihood
-#
-# Revised version:
-#   1. Uses monthly rather than seasonal metrics
-#   2. Does not mask peak-month values
-#   3. Fixes 12-month panel color scale to 0–0.30
-#   4. Produces publication-style maps without projected axis labels
-#   5. Uses the same deep-purple cyclic month colour band as the wind-anomaly figure
-#   6. Outputs only peak month and peak-month share maps
-#
-# Inputs:
-#   E:\RF B+G\wall2wall_windonly_finalmap
-#     ├─ hex_period_summary_wall2wall_windonly_final.csv
-#     └─ hex_indicator_summary_stylematch_4326.csv
-#
-# Main output figure:
-#   Fig_peak_month_and_peak_month_share_1x2
 # ============================================================
 
 from pathlib import Path
@@ -43,7 +26,7 @@ except Exception:
 
 
 # ============================================================
-# 0. User settings
+# User settings
 # ============================================================
 
 BASE = Path(os.environ.get("WALL2WALL_OUTDIR", r"E:\RF B+G\wall2wall_windonly_finalmap"))
@@ -86,13 +69,11 @@ MONTH_LABELS = [
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ]
 
-# Recommended:
-# "mean" = average predicted likelihood by month, then normalize across 12 months.
-# This avoids bias from unequal numbers of 16-day observations per month.
+
 PROFILE_BASIS = "mean"
 
 # Peak-month mask:
-# Peak month is only interpreted where the monthly profile is sufficiently concentrated.
+
 PEAK_MONTH_SHARE_MIN = 0.20
 EFFECTIVE_MONTHS_MAX = 6.0
 
@@ -100,7 +81,7 @@ EFFECTIVE_MONTHS_MAX = 6.0
 # "and" = show peak month only if both conditions are satisfied
 PEAK_MASK_RULE = "or"
 
-# 12-month panel color scale
+
 MONTHLY_SHARE_VMIN = 0.00
 MONTHLY_SHARE_VMAX = 0.30
 
@@ -111,7 +92,6 @@ DIFFUSE_COLOR = "#d9d9d9"
 SEA_COLOR = "white"
 BOUNDARY_COLOR = "0.35"
 
-# Set after geometry filtering. Stored as (xmin, ymin, xmax, ymax) in EPSG:3035.
 MAP_BOUNDS_3035 = None
 
 
@@ -135,10 +115,6 @@ def set_publication_style():
 
 
 def make_peak_month_cmap():
-    """
-    Month colour band used consistently with the wind-anomaly timing map.
-    Jan and Dec both grade into deep purple, giving a cyclic month scale.
-    """
     colors = [
         "#2c115f",  # Jan: deep purple
         "#3b2f8f",
@@ -162,7 +138,7 @@ def make_peak_month_cmap():
 
 
 # ============================================================
-# 1. Monthly metric helpers
+# Monthly metric
 # ============================================================
 
 def effective_months_from_shares(shares):
@@ -238,7 +214,7 @@ def circular_month_difference(m1, m2):
 
 
 # ============================================================
-# 2. Geometry and CRS helpers
+# Geometry and CRS helpers
 # ============================================================
 
 def get_projected_bbox(bbox4326=BBOX4326, target_crs=PLOT_CRS):
@@ -572,7 +548,7 @@ def get_is_point(gdf):
 
 
 # ============================================================
-# 3. Plot functions
+# Plot functions
 # ============================================================
 
 def draw_admin(ax, admin):
@@ -1069,7 +1045,7 @@ def plot_combined_circular_2x2(gdf, admin=None):
 
 
 # ============================================================
-# 4. Load hex-period prediction data
+# Load hex-period prediction data
 # ============================================================
 
 set_publication_style()
@@ -1122,7 +1098,7 @@ print(f"Mean predicted likelihood: {df['_pred'].mean():.6f}")
 
 
 # ============================================================
-# 5. Monthly likelihood profiles by hex
+# Monthly likelihood profiles by hex
 # ============================================================
 
 hex_total = (
@@ -1212,7 +1188,7 @@ print(SHARE_DESC)
 
 
 # ============================================================
-# 6. Wide monthly table
+#  Wide monthly table
 # ============================================================
 
 share_wide = (
@@ -1252,7 +1228,7 @@ hex_month_wide.to_csv(OUTDIR / "hex_monthly_likelihood_profiles_wide.csv", index
 
 
 # ============================================================
-# 7. Monthly timing and concentration metrics
+# Monthly timing and concentration metrics
 # ============================================================
 
 metric_rows = []
@@ -1304,7 +1280,7 @@ hex_month_metrics.to_csv(
 
 
 # ============================================================
-# 8. Combine all hex-level metrics
+# Combine all hex-level metrics
 # ============================================================
 
 hex_out = (
@@ -1336,7 +1312,7 @@ print(hex_out["peak_month_reliable"].value_counts(dropna=False))
 
 
 # ============================================================
-# 9. Summary tables
+# Summary tables
 # ============================================================
 
 summary_cols = [
@@ -1441,7 +1417,7 @@ print(peak_month_counts_masked)
 
 
 # ============================================================
-# 10. Merge with geometry and make maps
+#  Merge with geometry and make maps
 # ============================================================
 
 if HAS_GEO:
@@ -1489,11 +1465,6 @@ if HAS_GEO:
 
 else:
     print("\nGeopandas/shapely unavailable. CSV metrics were saved, but maps were not generated.")
-
-
-# ============================================================
-# 11. Done
-# ============================================================
 
 print("\n============================================================")
 print("All outputs saved to:")
