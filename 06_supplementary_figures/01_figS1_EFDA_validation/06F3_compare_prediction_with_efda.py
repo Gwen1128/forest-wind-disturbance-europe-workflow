@@ -1,38 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-06F3_compare_prediction_with_efda_DECILE.py
-
 Long-term spatial correspondence between modelled wind-disturbance probability
 and EFDA annual wind/bark-beetle complex disturbance.
-
-This version is intentionally simple and visual:
-    Do higher long-term predicted-probability hexagons also show higher
-    cumulative EFDA wind/bark-beetle disturbance rate?
-
-It uses only long-term prediction deciles and EFDA wind/bark disturbance rate.
-
-Main idea
----------
-1. Aggregate 16-day modelled probabilities to hex-level long-term metrics:
-   - pred_mean_long: mean prediction across 2003-2023
-   - pred_p95_long : 95th-percentile prediction across 2003-2023
-
-2. Aggregate EFDA annual wind/bark-beetle disturbance to hex-level cumulative
-   disturbance rate:
-   - efda_wind_bark_mean_annual_rate =
-       sum(EFDA wind/bark disturbed area, 2003-2023) / hex forest area
-
-3. Group hexagons into deciles of pred_mean_long and pred_p95_long.
-4. Plot area-weighted EFDA wind/bark cumulative disturbance rate by prediction decile.
-
-Outputs
--------
-prediction_efda_wind_bark_longterm_hex_joined.csv
-prediction_efda_wind_bark_decile_summary.csv
-prediction_efda_wind_bark_decile_key_stats.csv
-prediction_efda_wind_bark_deciles_pred_mean_long.png
-prediction_efda_wind_bark_deciles_pred_p95_long.png
-prediction_efda_wind_bark_deciles_combined.png
 """
 
 from pathlib import Path
