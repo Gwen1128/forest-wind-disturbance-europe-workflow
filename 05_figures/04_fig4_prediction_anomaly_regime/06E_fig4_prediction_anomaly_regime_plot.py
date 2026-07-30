@@ -2,10 +2,6 @@
 """
 START-FROM-SCRATCH combined Fig.4 + coarse spatial-quadrant threshold plot
 
-This script starts only from merged_prediction_anomaly_long_term.csv.
-It assigns each hexagon to four spatial quadrants using representative-point
-longitude and latitude, with Prague as the approximate division centre.
-
 Centre: Prague, lon = 14.4378, lat = 50.0755
 Northwest: lon < centre_lon and lat >= centre_lat
 Northeast: lon >= centre_lon and lat >= centre_lat
@@ -30,28 +26,25 @@ from matplotlib.lines import Line2D
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 # ============================================================
-# 0. PATHS
+# PATHS
 # ============================================================
-# The BAT file can override these paths through environment variables:
-#   FIG4_MERGED_CSV
-#   FIG4_QUADRANT_OUTDIR
-# If no environment variables are provided, the hard-coded defaults are used.
+
 
 MERGED_CSV = Path(os.environ.get(
     "FIG4_MERGED_CSV",
-    r"E:\RF_BG_REPRO_from_model_dev\outputs\06_fig4_prediction_anomaly_regime_prepare\long_term\merged_prediction_anomaly_long_term.csv"
+    r"E:\RF_BG_REPRO_from_model_dev\your_path\merged_prediction_anomaly_long_term.csv"
 ))
 
 OUTDIR = Path(os.environ.get(
     "FIG4_QUADRANT_OUTDIR",
     os.environ.get(
         "FIG4_OUTDIR",
-        r"E:\RF_BG_REPRO_from_model_dev\outputs\07_combined_abc_with_quadrant_smallmultiples"
+        r"E:\RF_BG_REPRO_from_model_dev\your_path\07_combined_abc_with_quadrant_smallmultiples"
     )
 ))
 
 # ============================================================
-# 1. SETTINGS
+#  SETTINGS
 # ============================================================
 
 TOP_PCTS = [5, 10, 20, 30]
