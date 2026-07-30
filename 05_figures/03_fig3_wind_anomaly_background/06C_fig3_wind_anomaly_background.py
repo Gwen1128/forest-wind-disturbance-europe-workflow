@@ -17,8 +17,6 @@ from pyproj import Transformer
 from shapely.geometry import box
 
 
-
-
 def open_xarray_dataset_compat(path):
     """Open NetCDF with fallback engines, useful when netCDF4 DLL is broken."""
     last_err = None
@@ -37,7 +35,7 @@ def open_xarray_dataset_compat(path):
 # =========================================================
 # USER SETTINGS
 # =========================================================
-INPUT_PRODUCTS_NC = Path(os.environ.get("WIND_PRODUCTS_NC", r"E:/RF B+G/wind_spacetime_maps_europe_main_admin/wind_spacetime_products_europe_main_admin_no_russia_no_iceland.nc"))
+INPUT_PRODUCTS_NC = Path(os.environ.get("WIND_PRODUCTS_NC", r"E:/RF B+G/your_path/wind_spacetime_products_europe_main_admin_no_russia_no_iceland.nc"))
 
 OUTDIR = Path(os.environ.get("FIG3_OUTDIR", r"E:/RF B+G/wind_spacetime_maps_europe_main_admin"))
 OUTDIR.mkdir(parents=True, exist_ok=True)
