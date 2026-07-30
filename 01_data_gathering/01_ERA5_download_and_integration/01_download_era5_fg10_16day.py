@@ -16,7 +16,7 @@ AREA = [71.2, -31.5, 23.75, 41.5]
 def retrieve_data(start_date: datetime, end_date: datetime):
     """
     Retrieve ERA5 fg10 (10m wind gust) for the given date range and save as a NetCDF file.
-    IMPORTANT: Uses CDS 'date' range to include ALL days in the window.
+    The CDS date range is inclusive.
     """
     filename = os.path.join(
         SAVE_DIR,
@@ -30,7 +30,6 @@ def retrieve_data(start_date: datetime, end_date: datetime):
     request = {
         "product_type": "reanalysis",
         "variable": ["10m_wind_gust_since_previous_post_processing"],
-        # Key fix: request the full date range (inclusive)
         "date": f"{start_date.strftime('%Y-%m-%d')}/{end_date.strftime('%Y-%m-%d')}",
         "time": [f"{hour:02d}:00" for hour in range(24)],
         "area": AREA,  # N/W/S/E
