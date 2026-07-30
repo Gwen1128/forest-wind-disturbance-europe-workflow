@@ -1,24 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Hex-period indicator suite with publication-style EPSG:3035 maps.
-
-This version keeps the original indicator calculations and the original red
-color palette, but replaces the old lon/lat plotting layout with the same
-publication map style used in the spatial-overlap and temporal-overlap figures:
-
-  - main-Europe bbox cleaning in lon/lat
-  - final plotting in EPSG:3035
-  - equal aspect with adjustable='box'
-  - no projected coordinate labels
-  - filtered European administrative footprint
-  - optional individual maps and one combined 2x2 figure
-
-Inputs are identical to the previous script:
-  --hex_distribution_csv
-  --hex_period_csv
-  --outdir
-  --countries_src
-"""
 
 import os
 import argparse
@@ -701,7 +680,7 @@ def main():
     parser.add_argument("--outdir", required=True, type=str)
     parser.add_argument("--countries_src", default=None, type=str)
     parser.add_argument("--hex_bbox4326", default=BBOX_LONLAT_DEFAULT, type=str,
-                        help="IMPORTANT: must match the hex_bbox4326 used in the original wall-to-wall prediction run.")
+                        help="Hex-grid extent used for the wall-to-wall prediction.")
     parser.add_argument("--plot_bbox4326", default="-12,34,45,72", type=str,
                         help="Only used for map clipping/plot extent. Does not rebuild or renumber hexes.")
     parser.add_argument("--hex_area_km2", default=2165.0, type=float)
