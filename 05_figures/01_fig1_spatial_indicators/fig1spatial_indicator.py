@@ -20,7 +20,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 # ============================================================
-# 0. Style / constants
+# 0. Style
 # ============================================================
 
 CMAP_RED = LinearSegmentedColormap.from_list(
@@ -129,7 +129,7 @@ def set_publication_style():
 
 
 # ============================================================
-# 2. Hex grid / input loading
+# 2. Hex grid 
 # ============================================================
 
 def hex_side_from_area(area_m2):
@@ -358,7 +358,7 @@ def compute_indicator_suite(period_df, id_col, pred_col, active_quantile=0.95):
 
 
 # ============================================================
-# 3. Publication map helpers
+# 3. Publication map
 # ============================================================
 
 def load_europe_admin_publication(countries_src, bbox4326):
