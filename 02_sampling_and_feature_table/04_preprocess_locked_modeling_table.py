@@ -1,16 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-8preprocessRF.py  —  LOCKED schema (NO BIOME)
-
-- Standardize column names across merged tiles
-- Output a locked modeling table with consistent feature names
-- Compute cross (interaction) features in preprocessing (not in training)
-- CV target-encode landcover and persist encoder mapping
-
-Notes
-- LAI_departure is used for sample_weight only.
-- Positive LAI_departure values are clipped to 0 before weighting.
-"""
 
 import os
 import argparse
