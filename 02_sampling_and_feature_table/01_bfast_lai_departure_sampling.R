@@ -3,15 +3,8 @@
 # Global sampling (no tiles) + storm_id=EventDate
 # PU sampling: distance strata + month-weighted dates + anti-leakage + bin1 cap
 # For each NEG: store ref_event_uid/ref_event_date/ref_storm_id/ref_event_dist_km
-#
-# FIX (DOMAIN BUG):
-#   - template_m / forest_mask_m are now built from UNION COVER of main+supp (first layer),
-#     instead of only r_main[[1]]. This prevents north/south being dropped simply because
-#     the first main layer is NA in those regions.
-#
-# Notes:
-#   - This script keeps your original "common_names = intersect(main, supp)" time alignment,
-#     but prints a warning if any date layers are missing in either stack.
+
+
 # =========================
 
 suppressPackageStartupMessages({
