@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Download selected country ZIP files from the European Forest Disturbance Atlas
-Zenodo record.
 
 Zenodo record:
 European Forest Disturbance Atlas, v2.1.1.
