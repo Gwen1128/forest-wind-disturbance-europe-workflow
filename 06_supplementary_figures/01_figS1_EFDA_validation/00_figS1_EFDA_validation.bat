@@ -5,7 +5,6 @@ cd /d "%~dp0"
 REM ============================================================
 REM Fig. S1 EFDA validation workflow
 REM
-REM This optional workflow runs 06F0-06F3.
 REM Edit hard-coded EFDA/output paths inside the Python scripts if needed.
 REM ============================================================
 
