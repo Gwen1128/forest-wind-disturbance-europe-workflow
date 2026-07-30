@@ -2,8 +2,7 @@
 """
 Optional helper for tile-based runs.
 Merges CSV files whose names match bfast*FINAL_ALL_FEATURES.csv into one feature table.
-This is not needed when 02_extract_geospatial_features.py creates a single
-bfastglobal_FINAL_ALL_FEATURES.csv directly.
+This is not needed when 02_extract_geospatial_features.py creates a single bfastglobal_FINAL_ALL_FEATURES.csv directly.
 """
 import argparse
 import os
