@@ -6,9 +6,6 @@ FigS2: Monthly share of predicted wind-disturbance likelihood (12 panels)
 FigS3: Absolute wind-speed reference maps combined into one 2-panel figure
         (a) Maximum wind speed
         (b) 95th-percentile wind speed
-
-This script integrates the monthly-share logic and the absolute-wind plotting logic
-so that both supplementary figures can be reproduced within the package workflow.
 """
 
 from pathlib import Path
