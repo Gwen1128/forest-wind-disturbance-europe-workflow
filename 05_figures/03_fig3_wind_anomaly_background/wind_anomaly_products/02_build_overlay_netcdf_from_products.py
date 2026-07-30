@@ -61,6 +61,7 @@ def write_overlay(ds, z_var: str, freq_var: str, out_path: Path):
             "freq_value": ds[freq_var].astype("float32"),
         }
     )
+    # Preserve useful coordinate metadata and compress.
     encoding = {
         "z_value": {"zlib": True, "complevel": 4, "dtype": "float32"},
         "freq_value": {"zlib": True, "complevel": 4, "dtype": "float32"},
@@ -75,7 +76,8 @@ def main():
 
     ds = open_dataset_fallback(PRODUCTS_NC)
 
-
+    # Long-term background: standardized relative to the local long-term distribution.
+    # Frequency is annualized to match the map/regime interpretation.
     write_overlay(
         ds,
         z_var="max_z_long",
@@ -83,6 +85,7 @@ def main():
         out_path=OUT_LONG,
     )
 
+    # Same-month background: standardized relative to the local same-calendar-month distribution.
     write_overlay(
         ds,
         z_var="max_z_month",
