@@ -62,8 +62,8 @@ def open_dataset_fallback(path):
 # 0. USER CONFIG
 # ============================================================
 
-BACKGROUND = os.environ.get("FIG5_BACKGROUND", "long_term")       # "long_term" or "same_month"
-WIND_PROFILE_METRIC = os.environ.get("FIG5_WIND_PROFILE_METRIC", "frequency")  # "frequency" for main text, "intensity" for supplementary
+BACKGROUND = os.environ.get("FIG5_BACKGROUND", "long_term")    
+WIND_PROFILE_METRIC = os.environ.get("FIG5_WIND_PROFILE_METRIC", "frequency")  
 
 BASE = Path(os.environ.get("ORIGINAL_BASE", r"E:\RF B+G"))
 
@@ -331,7 +331,7 @@ def background_label(bg):
 
 
 # ============================================================
-# 3. GEOMETRY / COORDINATE HELPERS
+# 3. GEOMETRY
 # ============================================================
 
 def detect_geometry_column(df):
@@ -731,7 +731,6 @@ def load_wind_temporal():
         print(f"Computed wind-anomaly peak month/share from raw WIND_NC using monthly {WIND_PROFILE_METRIC}. Valid hexes: {wind['wind_peak_month'].notna().sum():,}")
         return wind, monthly_out
 
-    # 1. Already aggregated temporal metrics.
     if Path(WIND_TEMP_CSV).exists():
         df = pd.read_csv(WIND_TEMP_CSV)
         df = standardize_hex_id(df)
@@ -1066,7 +1065,7 @@ def create_summary_tables(df):
 
 
 # ============================================================
-# 7. PLOTTING -- publication style matched to indicator-suite maps
+# 7. PLOTTING 
 # ============================================================
 
 
