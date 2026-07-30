@@ -1,35 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Jupyter-friendly unified script for European wind spatial + temporal background maps.
-
-Purpose
--------
-For Results section 3.4:
-Wind-anomaly background: magnitude, recurrence, and monthly timing.
-
-Main outputs
-------------
-1) Long-term spatial-temporal wind background 6-panel figure:
-   (a) max standardized anomaly
-   (b) anomaly frequency
-   (c) intensity-frequency contrast score
-   (d) peak month of anomalous wind occurrence
-   (e) peak-month share
-   (f) effective number of high-wind months
-
-2) Same-month version as sensitivity figure.
-
-3) NetCDF containing all products.
-
-Spatial domain
---------------
-- Administrative Europe main part
-- Russia excluded
-- Iceland excluded
-- Country boundaries overlaid
-- Ocean/excluded area shown in light grey
-
-Designed for HPC/Jupyter. No argparse.
+script for European wind spatial + temporal background maps.
 """
 
 from pathlib import Path
