@@ -5,11 +5,6 @@ cd /d "%~dp0"
 REM ============================================================
 REM Fig. 5 final reproduction
 REM
-REM This uses:
-REM   - Fig.2 prediction temporal metrics;
-REM   - fixed/current wind-anomaly temporal metrics if available;
-REM   - complete hex-area weights = 2165 km2 per hex.
-REM
 REM It rebuilds the final merged CSV, summary tables and figure.
 REM It does not reuse old merged_temporal_correspondence CSV.
 REM ============================================================
