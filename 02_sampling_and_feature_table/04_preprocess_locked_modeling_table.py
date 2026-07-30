@@ -166,7 +166,7 @@ def main():
     OUT_CSV = args.out_csv
     ENC_JSON = args.encoder_json
 
-    log(f"📥 读取数据: {INPUT_CSV} ...")
+    log(f"{INPUT_CSV} ...")
     df = pd.read_csv(INPUT_CSV)
 
     # rename
@@ -195,7 +195,7 @@ def main():
         df["LAI_departure"] = np.nan
     df["LAI_departure"] = pd.to_numeric(df["LAI_departure"], errors="coerce")
     df.loc[df["LAI_departure"] > 0, "LAI_departure"] = 0.0
-    log("LAI_departure 处理完毕：正值已归零（仅用于权重）。")
+    log("LAI_departure done")
 
     # ========= terrain_roughness =========
     c_rough = pick_first_numeric(df, ["terrain_roughness_std5", "terrain_roughness_std3", "terrain_roughness"])
@@ -270,8 +270,8 @@ def main():
     os.makedirs(os.path.dirname(OUT_CSV), exist_ok=True)
     out.to_csv(OUT_CSV, index=False)
 
-    log(f"✅ 预处理完成（锁死 schema，NO BIOME），输出至：{OUT_CSV}")
-    log("最终列名：")
+    log(f"done")
+    log("final colums：")
     log(str(list(out.columns)))
 
 if __name__ == "__main__":
