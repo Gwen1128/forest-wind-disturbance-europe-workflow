@@ -24,7 +24,7 @@ from shapely.geometry import box
 INPUT_NC = "E:/ERA/ERA5 16 combine/EU_final_structural_wind_features.nc"
 VAR_NAME = "max_wind_speed"
 
-OUTDIR = Path("E:/RF B+G/wind_spacetime_maps_europe_main_admin")
+OUTDIR = Path("E:/RF B+G/your path")
 OUTDIR.mkdir(parents=True, exist_ok=True)
 
 # If online access fails on HPC, replace this with your local Natural Earth shapefile/zip.
