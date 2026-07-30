@@ -4,18 +4,12 @@ Model-family comparison and wind-only model training for the paper-result reprod
 
 LOCKED schema training script for wind-disturbance PU learning.
 
-Expected core columns (from your preprocess output):
-- label (0/1), lon, lat, event_date (non-numeric ok)
-- LAI_departure (used for sample weighting; positive already zeroed in preprocess)
+Expected core columns :
+- label (0/1), lon, lat, event_date 
+- LAI_departure 
 - wind: gust_peak_speed, days_since_gust_peak, gust_peak_percentile
 - struct: tree_height, terrain_roughness, slope, aspect_sin, aspect_cos, landcover_enc
 - cross inputs: windwardness, exposure_intensity (or exposure), plus safe cross (exposure-based)
-
-Notes:
-- This script uses GroupKFold / StratifiedGroupKFold grouped by (lon,lat) to prevent spatial leakage.
-- shift_reweight trains a domain classifier (IN unlabeled vs HOLDOUT unlabeled) and reweights IN unlabeled samples.
-- residual model (optional) is a wind-offset GLM; with --residual_gate it is trained/evaluated only on strong-wind subset.
-- CLI args --neg_ratio and --neg_match_holdout are currently parsed for compatibility but not used for subsampling logic.
 """
 
 from __future__ import annotations
