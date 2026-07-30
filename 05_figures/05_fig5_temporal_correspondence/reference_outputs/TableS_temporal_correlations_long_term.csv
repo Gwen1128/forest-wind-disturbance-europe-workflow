@@ -1,4 +1,0 @@
-﻿comparison,weighted_pearson,spearman_rho,spearman_p
-Prediction peak-month share vs wind-anomaly peak-month share,0.24188227210965102,0.2653615545965456,4.826722555472719e-58
-Peak-month cosine component,0.2723621653107814,0.30044318576745005,1.1778459276646579e-74
-Peak-month sine component,0.11671877591697571,0.11823657168093013,1.76211684152561e-12
