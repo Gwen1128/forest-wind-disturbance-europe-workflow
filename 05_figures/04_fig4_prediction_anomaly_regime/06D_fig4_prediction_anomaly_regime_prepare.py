@@ -1,27 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Section 3.5 final analysis: prediction × wind-anomaly frequency–intensity regimes
-
-Why this script
----------------
-This script replaces the earlier prediction-defined hotspot typology with a more
-transparent two-step design:
-
-1. Define wind-anomaly regimes independently from prediction outputs, using only
-   anomaly frequency and standardized anomaly intensity.
-2. Quantify whether mean and p95 wind-only predictions are enriched within those
-   independent wind-anomaly regimes.
-
-Main output for each background in BACKGROUNDS
----------------------------------------------
-1. merged_prediction_anomaly_<background>.csv
-
-This is the only preparation output required by
-06E_fig4_prediction_anomaly_regime_plot.py. Diagnostic tables and preliminary
-maps from the development version are intentionally not written in this minimal
-paper-results package.
-
-Author: adapted from your 19winddisturboverlap.py and 19spatialoverlaplongterm.py
 """
 
 from pathlib import Path
@@ -44,9 +23,6 @@ from matplotlib.patches import Patch
 from scipy.stats import spearmanr
 from sklearn.linear_model import LinearRegression
 
-
-
-
 # ============================================================
 # NetCDF opening helper with backend fallback
 # ============================================================
@@ -67,7 +43,7 @@ def open_dataset_fallback(path):
     raise RuntimeError("Could not open NetCDF file with available engines:\n" + "\n".join(errors))
 
 # ============================================================
-# 0. USER CONFIG
+# USER CONFIG
 # ============================================================
 
 # Prediction table used to draw mean and p95 maps.
@@ -81,8 +57,8 @@ PRED_CSV = Path(os.environ.get(
 #   z_value   = standardized anomaly intensity
 #   freq_value = anomaly frequency
 ANOM_NC_BY_BG = {
-    "long_term": Path(os.environ.get("WIND_OVERLAY_LONG_NC", r"E:\RF B+G\windmap\overlay_result_long_term_background.nc")),
-    "same_month": Path(os.environ.get("WIND_OVERLAY_MONTH_NC", r"E:\RF B+G\windmap\overlay_result_same_month_background.nc")),
+    "long_term": Path(os.environ.get("WIND_OVERLAY_LONG_NC", r"E:\RF B+G\your_path\overlay_result_long_term_background.nc")),
+    "same_month": Path(os.environ.get("WIND_OVERLAY_MONTH_NC", r"E:\RF B+G\your_path\overlay_result_same_month_background.nc")),
 }
 
 # Main analysis output folder
@@ -165,7 +141,7 @@ SAVE_FIGURES = True
 
 
 # ============================================================
-# 1. STYLE AND UTILITIES
+#  STYLE AND UTILITIES
 # ============================================================
 
 def set_publication_style():
@@ -280,7 +256,7 @@ def get_analysis_valid_mask(df):
 
 
 # ============================================================
-# 2. NETCDF SAMPLING
+# NETCDF SAMPLING
 # ============================================================
 
 def infer_lat_lon_names(ds):
@@ -390,7 +366,7 @@ def sample_nc_to_points(ds, varname, lons, lats):
 
 
 # ============================================================
-# 3. DATA LOADING
+# DATA LOADING
 # ============================================================
 
 def load_prediction_table(pred_csv: Path):
@@ -545,7 +521,7 @@ def add_anomaly_metrics(gdf, anom_nc: Path, background: str):
 
 
 # ============================================================
-# 4. FLAGS AND INDEPENDENT WIND REGIME TYPOLOGY
+# FLAGS AND INDEPENDENT WIND REGIME TYPOLOGY
 # ============================================================
 
 def add_prediction_flags(df, q_pred=Q_HIGH_PRED_BASELINE):
@@ -567,10 +543,6 @@ def add_prediction_flags(df, q_pred=Q_HIGH_PRED_BASELINE):
 
 
 def add_frequency_intensity_regime(df, wind_q=WIND_Q_BASELINE):
-    """
-    Independent typology based only on frequency and intensity.
-    Prediction variables are not used here.
-    """
     out = df.copy()
     valid = get_analysis_valid_mask(out)
     d = out.loc[valid].copy()
@@ -630,7 +602,7 @@ def add_all_flags(df):
 
 
 # ============================================================
-# 5. QUANTIFICATION TABLES
+#  QUANTIFICATION TABLES
 # ============================================================
 
 def spearman_table(df):
@@ -689,10 +661,6 @@ def top_mask_by_weighted_quantile(d, pred_col, q_pred):
 
 
 def table_s1_overlay_enrichment_sensitivity(df):
-    """
-    For top 30/20/10% prediction areas, quantify enrichment in:
-    high frequency, high intensity, compound high frequency-high intensity.
-    """
     valid = get_analysis_valid_mask(df)
     base = df.loc[valid].copy()
     total_area = base["area_weight_km2"].sum()
@@ -838,7 +806,7 @@ def table_s4_threshold_sensitivity(df):
 
 
 # ============================================================
-# 6. ADMIN AND MAP GEOMETRY HELPERS
+# ADMIN AND MAP GEOMETRY HELPERS
 # ============================================================
 
 def load_admin(admin_path):
@@ -988,7 +956,7 @@ def add_overlay_legend(ax, label):
 
 
 # ============================================================
-# 7. FIGURES
+#  FIGURES
 # ============================================================
 
 def add_horizontal_colorbar(fig, ax_left, ax_right, cmap, vmin, vmax, label, y_offset=0.045):
@@ -1157,17 +1125,10 @@ def make_all_figures(df, background, outdir, admin_gdf):
 
 
 # ============================================================
-# 8. MAIN WORKFLOW
+#  MAIN WORKFLOW
 # ============================================================
 
 def run_background(base_gdf, background):
-    """Prepare the single merged table required by the Fig. 4 plotting script.
-
-    The original development script also wrote diagnostic tables and preliminary
-    maps. Those outputs are intentionally omitted from the paper-results package
-    to keep the reproduction folder minimal. All Fig. 4 source-data tables are
-    generated downstream by 06E_fig4_prediction_anomaly_regime_plot.py.
-    """
     print("\n" + "#" * 80)
     print(f"Running background: {background}")
     print("#" * 80)
