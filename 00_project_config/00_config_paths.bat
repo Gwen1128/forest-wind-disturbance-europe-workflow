@@ -105,7 +105,7 @@ set "SCRIPT_MAIN=%ABLATION_SCRIPT%"
 set "TABLE1_HELPER=%PROJECT_ROOT%\03_model_training\make_table1_from_metrics.py"
 
 set "WALL2WALL_SCRIPT=%PROJECT_ROOT%\04_wall_to_wall_prediction\wall2wall_windonly_prediction.py"
-set "FIG1_SCRIPT=%PROJECT_ROOT%\05_figures\01_fig1_spatial_indicators\18hex_period_indicator_suite_STYLEMATCH_3035_PUBLICATION_NO_AUTOGEOM.py"
+set "FIG1_SCRIPT=%PROJECT_ROOT%\05_figures\01_fig1_spatial_indicators\fig1spatial_indicator.py"
 set "FIG2_SCRIPT=%PROJECT_ROOT%\05_figures\02_fig2_monthly_concentration\06B_fig2_prediction_monthly_concentration.py"
 set "FIG3_SCRIPT=%PROJECT_ROOT%\05_figures\03_fig3_wind_anomaly_background\06C_fig3_wind_anomaly_background.py"
 set "FIG4_PREP_SCRIPT=%PROJECT_ROOT%\05_figures\04_fig4_prediction_anomaly_regime\06D_fig4_prediction_anomaly_regime_prepare.py"
