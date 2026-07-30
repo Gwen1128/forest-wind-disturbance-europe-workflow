@@ -2,11 +2,6 @@
 """
 Extract selected EFDA country ZIPs and inspect raster files.
 
-This helps identify:
-- annual disturbance stack
-- year-of-disturbance layers
-- disturbance agent layers
-- severity layers
 """
 
 from pathlib import Path
