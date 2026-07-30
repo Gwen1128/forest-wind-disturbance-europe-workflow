@@ -2,33 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Wall-to-wall wind-only full inference from raw wind nc + forest mask + trained artifact.
-
-Outputs
--------
-1) Mean predicted wind-disturbance probability (MAIN MAP)
-2) 95th percentile predicted wind-disturbance probability (SUPPLEMENTARY)
-3) Optional conditional severity map ONLY if a matching LAI-departure nc is provided
-
-Main idea
----------
-- Reproject forest mask onto the raw wind grid
-- Keep wind-grid cells whose forest fraction >= threshold
-- For each forest grid cell and each time step, compute:
-    gust_peak_speed       = raw wind value at that time step
-    gust_peak_percentile  = within-cell percentile rank across the full time series
-- Use the trained wind-only base model from the joblib artifact to predict pred_wind
-- Aggregate pred_wind to hex x 16-day period via forest-weighted area fractions
-- Build final maps:
-    Mean predicted disturbance probability = time-mean of hex-period mean pred_wind
-    P95 predicted disturbance probability  = time-wise 95th percentile of hex-period mean pred_wind
-
-Notes
------
-- This script avoids sample-based recurrence/frequency.
-- It assumes the raw wind nc time axis already represents the period-level wind product
-  that is most comparable to your wind-only model features.
-- If your wind nc has a finer temporal step than the training features, prepare a matching
-  period-level nc first.
 """
 
 import os
@@ -483,12 +456,6 @@ def main():
     pred = pred_flat.reshape(nt, wind_flat.shape[1])
 
     # ------------------------------------------------------------------
-    # Correct recurrence definition:
-    # 1) aggregate pred_wind to HEX x PERIOD using area-weighted mean
-    # 2) define active periods from the global quantile of HEX-PERIOD mean pred
-    # 3) recurrence = active periods / valid periods
-    # This avoids counting many active pixels within the same hex-period.
-    # ------------------------------------------------------------------
     unique_hex, hex_code = np.unique(hex_ids, return_inverse=True)
     denom = np.bincount(hex_code, weights=weight_cell, minlength=len(unique_hex)).astype(float)
     T = nt
@@ -506,10 +473,7 @@ def main():
             sev_mean = np.divide(sev_num, denom, out=np.full_like(sev_num, np.nan), where=denom > 0)
             severity_arr[t] = sev_mean.astype("float32")
 
-    # Final map products:
-    # 1) direct model-predicted disturbance distribution = time-mean of HEX-PERIOD mean pred_wind
-    # 2) upper-tail predicted disturbance distribution = time-wise P95 of HEX-PERIOD mean pred_wind
-    # 3) conditional severity among globally active periods (optional, only if LAI provided)
+    # Final map:
     mean_pred_all = np.nanmean(mean_pred_arr, axis=0)
     pred_p95 = np.nanquantile(mean_pred_arr, 0.95, axis=0)
 
