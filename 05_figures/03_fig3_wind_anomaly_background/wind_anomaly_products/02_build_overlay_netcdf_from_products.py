@@ -12,7 +12,7 @@ BASE = Path(os.environ.get("ORIGINAL_BASE", r"E:\RF B+G"))
 
 PRODUCTS_NC = Path(os.environ.get(
     "WIND_PRODUCTS_NC",
-    str(BASE / r"wind_spacetime_maps_europe_main_admin"
+    str(BASE / r"your_path"
                r"\wind_spacetime_products_europe_main_admin_no_russia_no_iceland.nc")
 ))
 
