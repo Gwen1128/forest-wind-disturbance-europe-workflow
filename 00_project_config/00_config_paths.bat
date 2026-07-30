@@ -77,16 +77,7 @@ set "WIND_PRODUCTS_NC=%ORIGINAL_BASE%\wind_spacetime_maps_europe_main_admin\wind
 set "WIND_OVERLAY_LONG_NC=%ORIGINAL_BASE%\windmap\overlay_result_long_term_background.nc"
 set "WIND_OVERLAY_MONTH_NC=%ORIGINAL_BASE%\windmap\overlay_result_same_month_background.nc"
 
-REM Fig. 5 wind-timing intermediate.
-REM For exact reproduction of the locked Fig. 5 output, use the retained
-REM wind temporal metrics shipped with this package. This is a process output
-REM from the wind-anomaly timing workflow, not the final merged Fig. 5 table.
-set "WIND_TEMP_CSV=%PROJECT_ROOT%\05_figures\05_fig5_temporal_correspondence\retained_intermediates\TableS_wind_anomaly_temporal_metrics_long_term_frequency.csv"
-
-REM Optional external wind-anomaly intermediates kept as fallbacks/documentation.
-set "WIND_TEMP_CSV_EXTERNAL=%ORIGINAL_BASE%\wind_anomaly_temporal_metrics\hex_wind_anomaly_temporal_metrics_long_term.csv"
-set "WIND_MONTHLY_PROFILE_CSV=%ORIGINAL_BASE%\section_3_6_existing_wind_anomaly_timing\hex_monthly_wind_anomaly_profiles_long_term.csv"
-set "WIND_PERIOD_ANOMALY_CSV=%ORIGINAL_BASE%\section_3_6_existing_wind_anomaly_timing\hex_period_wind_anomaly_long_term.csv"
+set "WIND_NC=E:\ERA\ERA5 16 combine\EU_final_structural_wind_features.nc"
 
 REM ------------------------------------------------------------
 REM Scripts inside this reproducibility package
@@ -217,7 +208,7 @@ REM Fig. 5 locked reproduction settings.
 REM The confirmed original Fig. 5 agreement classes use complete hex-area
 REM weights of 2165 km2 per analysed hex, not forest_area_km2 weights.
 set "FIG5_FORCE_REBUILD=1"
-set "FIG5_FORCE_WIND_FROM_NC=0"
+set "FIG5_FORCE_WIND_FROM_NC=1"
 set "FIG5_REWRITE_TABLES_FROM_EXISTING_CSV=0"
 set "FIG5_AREA_WEIGHT_MODE=hex"
 set "FIG5_HEX_AREA_KM2=%HEX_AREA_KM2%"
