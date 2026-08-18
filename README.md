@@ -1,7 +1,7 @@
 # Forest wind-disturbance workflow
 Code used for the manuscript “Two decades of estimated forest wind disturbance reveal recurrent and episodic patterns across Europe”.
 
-# Workflow
+## Workflow
 1. Configure paths
    Edit `00_project_config/00_config_paths.bat`.
 
@@ -25,4 +25,4 @@ Code used for the manuscript “Two decades of estimated forest wind disturbance
 7. Generate the supplementary figures
    Run the batch files in `06_supplementary_figures`.
 
-# Input data and intermediate outputs are not included. Local file paths should be adjusted before running the workflow.
+Input data and intermediate outputs are not included. Local file paths should be adjusted before running the workflow.
