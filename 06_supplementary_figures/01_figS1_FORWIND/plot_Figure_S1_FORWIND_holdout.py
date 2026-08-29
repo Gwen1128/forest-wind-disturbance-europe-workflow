@@ -10,23 +10,19 @@ Then run:
     python plot_Figure_S4_FORWIND_holdout.py
 
 Required packages:
-    numpy, pandas, matplotlib, scikit-learn, basemap
+    numpy, pandas, matplotlib, scikit-learn
 
-The script deliberately does not require GeoPandas, Fiona, or Cartopy.
+The script deliberately does not require GeoPandas, Fiona, Cartopy, or Basemap.
 """
 
 from __future__ import annotations
 
 import argparse
-import math
 import struct
 from collections import Counter
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
-from matplotlib.patches import Rectangle
-from mpl_toolkits.basemap import Basemap
 import numpy as np
 import pandas as pd
 from sklearn.neighbors import BallTree
@@ -38,13 +34,7 @@ HOLDOUT_XMAX = 24.17
 HOLDOUT_YMIN = 55.25
 HOLDOUT_YMAX = 69.06
 
-# Display extent. This focuses on the European part of the database.
-MAP_XMIN = -12.0
-MAP_XMAX = 42.0
-MAP_YMIN = 42.0
-MAP_YMAX = 70.0
-
-# Main high-record countries used in panel b.
+# Five countries with the largest FORWIND record counts.
 COMPARISON_COUNTRIES = ["LT", "IT", "DE", "FR", "SE"]
 COUNTRY_NAMES = {
     "LT": "Lithuania",
@@ -224,7 +214,6 @@ def build_country_metrics(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def make_figure(
-    data: pd.DataFrame,
     metrics: pd.DataFrame,
     output_dir: Path,
     output_format: str,
@@ -243,106 +232,9 @@ def make_figure(
         }
     )
 
-    figure, (map_axis, bar_axis) = plt.subplots(
-        1,
-        2,
-        figsize=(7.2, 3.65),
-        gridspec_kw={"width_ratios": [1.35, 1.0]},
-    )
+    figure, bar_axis = plt.subplots(figsize=(4.35, 3.45))
 
-    # Panel a: reference-record distribution and holdout boundary.
-    # Basemap supplies coastlines and national borders without requiring a
-    # separate boundary file or an online download.
-    europe_map = Basemap(
-        projection="cyl",
-        llcrnrlon=MAP_XMIN,
-        urcrnrlon=MAP_XMAX,
-        llcrnrlat=MAP_YMIN,
-        urcrnrlat=MAP_YMAX,
-        resolution="l",
-        suppress_ticks=False,
-        ax=map_axis,
-    )
-    europe_map.drawmapboundary(
-        fill_color="white", color="#666666", linewidth=0.55
-    )
-    europe_map.drawcoastlines(
-        color="#777777", linewidth=0.42, zorder=0.4
-    )
-    europe_map.drawcountries(
-        color="#A0A0A0", linewidth=0.32, zorder=0.5
-    )
-
-    map_data = data[
-        data["lon"].between(MAP_XMIN, MAP_XMAX)
-        & data["lat"].between(MAP_YMIN, MAP_YMAX)
-    ]
-    training = map_data[map_data["Country"] != "SE"]
-    sweden = map_data[map_data["Country"] == "SE"]
-
-    map_axis.scatter(
-        training["lon"],
-        training["lat"],
-        s=0.7,
-        color=TRAINING_COLOR,
-        alpha=0.22,
-        linewidths=0,
-        rasterized=True,
-        zorder=1,
-    )
-    map_axis.scatter(
-        sweden["lon"],
-        sweden["lat"],
-        s=1.2,
-        color=HOLDOUT_COLOR,
-        alpha=0.50,
-        linewidths=0,
-        rasterized=True,
-        zorder=2,
-    )
-
-    holdout_rectangle = Rectangle(
-        (HOLDOUT_XMIN, HOLDOUT_YMIN),
-        HOLDOUT_XMAX - HOLDOUT_XMIN,
-        HOLDOUT_YMAX - HOLDOUT_YMIN,
-        fill=False,
-        edgecolor=HOLDOUT_COLOR,
-        linewidth=1.1,
-        linestyle="--",
-        zorder=3,
-    )
-    map_axis.add_patch(holdout_rectangle)
-    map_axis.set_xlim(MAP_XMIN, MAP_XMAX)
-    map_axis.set_ylim(MAP_YMIN, MAP_YMAX)
-    map_axis.set_xlabel("Longitude (°E)")
-    map_axis.set_ylabel("Latitude (°N)")
-    map_axis.set_aspect(1.0 / math.cos(math.radians(55.0)))
-    map_axis.grid(color="#E5E5E5", linewidth=0.45, zorder=0)
-    map_axis.legend(
-        handles=[
-            Line2D(
-                [], [], marker="o", linestyle="", markersize=3.2,
-                color=TRAINING_COLOR, label="Training records"
-            ),
-            Line2D(
-                [], [], marker="o", linestyle="", markersize=3.2,
-                color=HOLDOUT_COLOR, label="Sweden holdout"
-            ),
-        ],
-        # The upper-left part of this panel is empty, so the legend does not
-        # obscure any reference records.
-        loc="upper left",
-        bbox_to_anchor=(0.01, 0.91),
-        frameon=False,
-        fontsize=7.5,
-        handletextpad=0.4,
-    )
-    map_axis.text(
-        0.01, 0.99, "(a)", transform=map_axis.transAxes,
-        ha="left", va="top", fontweight="bold", fontsize=9
-    )
-
-    # Panel b: dispersion comparison among the principal high-record countries.
+    # Spatial-dispersion comparison among the five highest-record countries.
     comparison = metrics.loc[COMPARISON_COUNTRIES].copy()
     values = comparison["mean_nearest_neighbour_km"].to_numpy()
     labels = [COUNTRY_NAMES[code] for code in comparison.index]
@@ -356,12 +248,8 @@ def make_figure(
     bar_axis.set_axisbelow(True)
     bar_axis.spines["top"].set_visible(False)
     bar_axis.spines["right"].set_visible(False)
-    bar_axis.text(
-        0.01, 0.99, "(b)", transform=bar_axis.transAxes,
-        ha="left", va="top", fontweight="bold", fontsize=9
-    )
 
-    figure.subplots_adjust(left=0.075, right=0.985, bottom=0.20, top=0.97, wspace=0.31)
+    figure.subplots_adjust(left=0.18, right=0.98, bottom=0.23, top=0.97)
     if output_format == "pdf":
         figure.savefig(
             output_dir / "Figure_S4_FORWIND_holdout.pdf",
@@ -429,8 +317,8 @@ def main() -> None:
     metrics.to_csv(output_dir / "Figure_S4_country_metrics.csv")
     # Render each format with a fresh figure. This keeps both the vector PDF
     # and the high-resolution PNG reliable across Matplotlib backends.
-    make_figure(data, metrics, output_dir, "pdf")
-    make_figure(data, metrics, output_dir, "png")
+    make_figure(metrics, output_dir, "pdf")
+    make_figure(metrics, output_dir, "png")
 
     holdout_records = data[data["Country"] == "SE"]
     other_countries_in_rectangle = data[
